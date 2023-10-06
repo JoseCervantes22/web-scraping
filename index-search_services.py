@@ -66,8 +66,8 @@ for index, row in data.iterrows():
     response = requests.post(url, headers=headers, data=data_json)
 
     # Check if the request was successful
-    if response.status_code == 201:
-        print('Documento enviado con éxito al índice.')
+    if response.status_code == 200:
+        print('Document successfully submitted to the index.')
     else:
         print(f'Código de estado: {response.status_code}')
         print(response.text)
