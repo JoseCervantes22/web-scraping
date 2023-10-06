@@ -2,11 +2,11 @@ import pandas as pd # Install pandas: pip install pandas
 import json # No need to install json; it's part of Python's standard library
 import requests # Install requests: pip install requests
 
-search_service_name = '.search.windows.net'
-index_name = ''
-api_version = '2023-07-01-Preview'  # The version of the API you are using
+search_service_name = 'YOUR_SEARCH_SERVICE_NAME.search.windows.net'
+index_name = 'YOUR_INDEX_NAME'
+api_version = 'YOUR_API_VERSION'  # The version of the API you are using
 
-api_key = '' # The API you are using
+api_key = 'YOUR_API_KEY' # The API you are using
 headers = {
     'Content-Type': 'application/json',
     'api-key': api_key
