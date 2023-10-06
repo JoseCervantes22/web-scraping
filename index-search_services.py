@@ -1,86 +1,204 @@
-import requests
-from bs4 import BeautifulSoup
-import json
+import requests  # Install requests: pip install requests
 
-search_service_name = 'securygpt.search.windows.net'
-index_name = 'index-website'
-api_version = '2023-07-01-Preview'
+from bs4 import BeautifulSoup  # Install beautifulsoup4: pip install beautifulsoup4
 
-# URL del servicio de búsqueda
-search_url = f'https://{search_service_name}/indexes/{index_name}/docs/index?api-version={api_version}'
+import json  # No need to install json; it's part of Python's standard library
 
-# Definir el encabezado de autorización (necesitarás un token de autenticación)
-api_key = 'ASkaLb4Ob0QcGCPDUlcEAv9FV7565ihYjK34SWYFzNAzSeD5XUar'
+search_service_name = 'YOUR_SERVICE_NAME.search.windows.net'
+index_name = 'YOUR_INDEX'
+api_version = '2023-07-01-Preview'  # The version of the API you are using
+
+api_key = 'YOUR_API_SEARCH' # The API you are using
 headers = {
     'Content-Type': 'application/json',
     'api-key': api_key
 }
 
-# URL de la página principal
+# Construct the URL for a search request
+cognitive_url = f'https://{search_service_name}/indexes/{index_name}/docs/index?api-version={api_version}'
+
+# Home page URL CalHR benefits
 url = "https://calhr.benefitsprograms.info/"
 
-# Realiza una solicitud GET a la página principal
+# Make a GET request to the main page
 response = requests.get(url)
 
-# Comprueba si la solicitud fue exitosa
+login_url=('https://calhr.benefitsprograms.info/wp-login.php?action=postpass')
+
+payload={
+    'post_password':'2021StateHRP'
+}
+# Check if the request was successful
 if response.status_code == 200:
-    # Analiza el HTML de la página principal
+    # Parse the HTML of the main page
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Encuentra el menú de navegación principal
-    main_menu = soup.find('ul', id='top-menu')
+    # Find the main navigation menu (menu-top)
+    main_menu_top = soup.find('ul', id='top-menu')
+    
+    # Find all menu items (li) with links (a) in the menu-top
+    menu_top_items = main_menu_top.find_all('li', class_='menu-item')
 
-    # Encuentra todos los elementos de menú (li) con enlaces (a)
-    menu_items = main_menu.find_all('li', class_='menu-item')
-
-    # Itera a través de los elementos de menú para extraer títulos y enlaces
-    for menu_item in menu_items:
-        menu_link = menu_item.find('a')
-        menu_title = menu_link.text
-        menu_url = menu_link['href']
+    id_counter=0
+    
+    # Iterate through top-menu items to extract titles and links
+    print("Top-menu:")
+    for menu_top_item in menu_top_items:
+        menu_top_link = menu_top_item.find('a')
+        menu_top_title = menu_top_link.text
+        menu_top_url = menu_top_link['href']
         
-        # Realiza una solicitud GET a la subpágina
-        subpage_response = requests.get(menu_url)
-        
-        # Comprueba si la solicitud a la subpágina fue exitosa
+        subpage_response = requests.get(menu_top_url)
         if subpage_response.status_code == 200:
-            # Analiza el HTML de la subpágina
+            # Parse the HTML of the subpage
             subpage_soup = BeautifulSoup(subpage_response.text, 'html.parser')
             
-            # Encuentra el contenido que deseas extraer (por ejemplo, un div con una clase específica)
+            # Find the content you want to extract (for example, a div with a specific class)
             content_div = subpage_soup.find('div', class_='et_pb_section et_pb_section_1 et_section_regular')
+            id_counter += 1
             
-            if content_div:
-                print("Título de la página:", menu_title)
-                print("Contenido de la página:")
-                print(content_div.text)
-                print("Link:", menu_url)
+            print("Page title:", menu_top_title)
+            print("Content:")
+            print(content_div.text)
+            print("Link:", menu_top_url)
+            print("id",str(id_counter))
                 
-                
-                data_to_send = {
-                    "@search.score": 1,
-                    "value": [
+            data_to_send = {
+                "@search.score": 1,
+                "value": [
                     {
-                        "id": "1",
-                        "website": menu_title,  
-                        "content": content_div.text,
-                        "link": menu_url
+                        "id": str(id_counter),
+                        "Title": menu_top_title,  
+                        "Content": content_div.text,
+                        "URL": menu_top_url
                     }
-                    ]
-                }
+                ]
+            }
+            # Convert data to JSON
+            data_json = json.dumps(data_to_send)
+            response = requests.post(cognitive_url, headers=headers, data=data_json)
+            # Check if the request was successful
+            if response.status_code == 200:
+                print('Document successfully sent to index.')
+            else:
+                print(f'Error sending document. Status code: {response.status_code}')
+           
+            content_links = [] 
 
-                data_json = json.dumps(data_to_send)
+            social_media = ['facebook.com', 'twitter.com', 'instagram.com']
+            if content_div:
+                links_in_content = content_div.find_all('a')
+                
+                
+                for link in links_in_content:
+                    href = link.get('href')
 
-                # Realizar la solicitud POST al servicio de búsqueda
-                response = requests.post(search_url, headers=headers, data=data_json)
-                if response.status_code == 201:
-                    print('Documento enviado con éxito al índice.')
-                else:
-                    print(f'Error al enviar el documento. Código de estado: {response.status_code}')
-                    print(response.text)
+                
+                    if href and href not in content_links and not any(rs in href for rs in social_media) and href.startswith("https://calhr.benefitsprograms.info/"):
+                        content_links.append(href)
+                        content_div_content_links = subpage_soup.find('div', class_='et_pb_section et_pb_section_1 et_section_regular')
+                    
+                        if content_div_content_links:
+                            print("Title")
+                            print('Content:')
+                            print(content_div_content_links.text)
+                            print("Link: ",href)
+                            print('id',str(id_counter))
+                            data_to_send = {
+                                "@search.score": 1,
+                                "value": [
+                                    {
+                                        "id": str(id_counter),
+                                        "Title": "",  
+                                        "Content": content_div.text,
+                                        "URL": href
+                                    }
+                                ]
+                            }
+                            # Convert data to JSON
+                            data_json = json.dumps(data_to_send)
+                            response = requests.post(cognitive_url, headers=headers, data=data_json)
+                            # Check if the request was successful
+                            if response.status_code == 200:
+                                print('Document successfully sent to index.')
+                            else:
+                                print(f'Error sending document. Status code: {response.status_code}')
+              
+                        else:
+                            print('Not content')
+                    elif href:
+                        print('content_repeat')
+                        
+             
 
             else:
-                print(f"No se encontró contenido en la subpágina: {menu_url}")
-        
+                print(f"Content from login:{menu_top_url}")
+            
+                with requests.session() as s:
+                    s.post(login_url, data=payload)
+                    r=s.get(menu_top_url)
+                    menu_top_link = menu_top_item.find('a')
+                    menu_top_title = menu_top_link.text
+                    soup=BeautifulSoup(r.content,'html.parser')
+                    content_div = soup.find('div', class_='et_pb_section et_pb_section_1 et_section_regular')
+                    if content_div:
+                        print("Page title:", menu_top_title)
+                        print("Content:")
+                        print(content_div.text)
+                        print("link",menu_top_url)
+                        print("id",str(id_counter))
+                        
+                        data_to_send = {
+                            "@search.score": 1,
+                            "value": [
+                                {
+                                    "id": str(id_counter),
+                                    "Title": menu_top_title,  
+                                    "Content": content_div.text,
+                                    "URL": menu_top_url
+                                }
+                            ]
+                        }
+                        # Convert data to JSON
+                        data_json = json.dumps(data_to_send)
+                        response = requests.post(cognitive_url, headers=headers, data=data_json)
+                        # Check if the request was successful
+                        if response.status_code == 200:
+                            print('Document successfully sent to index.')
+                        else:
+                            print(f'Error sending document. Status code: {response.status_code}')
+                        
+                    else:
+                        content_div_2 = soup.find('div', class_='et_pb_section et_pb_section_2 et_section_regular')
+                        if content_div_2:
+                            print("Page title:", menu_top_title)
+                            print("Content")
+                            print(content_div_2.text)
+                            print("link ",menu_top_url)
+                            print("id",str(id_counter))
+                            
+                            data_to_send = {
+                                "@search.score": 1,
+                                "value": [
+                                    {
+                                        "id": str(id_counter),
+                                        "Title": menu_top_title,  
+                                        "Content": content_div_2.text,
+                                        "URL": menu_top_url
+                                    }
+                                ]
+                            }
+                            # Convert data to JSON
+                            data_json = json.dumps(data_to_send)
+                            response = requests.post(cognitive_url, headers=headers, data=data_json)
+                            # Check if the request was successful
+                            if response.status_code == 200:
+                                print('Document successfully sent to index.')
+                            else:
+                                print(f'Error sending document. Status code: {response.status_code}')
+                                
+                        else:
+                            print("No content")
+                           
 else:
-    print("La solicitud a la página principal no fue exitosa. Código de estado:", response.status_code)
+    print("The request to the home page was not successful. Status code:", response.status_code)
