@@ -44,9 +44,9 @@ for index, row in data.iterrows():
         "value": [
             {
                 "id": str(id_counter),
-                "Title": department,  
-                "Content": combined_text,
-                "URL": csv_url
+                "title": department,  
+                "content": combined_text,
+                "url": csv_url
             }
         ]
     }
