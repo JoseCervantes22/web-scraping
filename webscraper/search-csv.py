@@ -24,7 +24,7 @@ url_csv = f"https://raw.githubusercontent.com/JoseCervantes22/Q-A/main/BenieTrai
 data = pd.read_csv(url_csv)
 
 # Initialize a counter for the ID
-id_counter = 67
+id_counter = 100
 
 # Iterate through the rows of the DataFrame
 for index, row in data.iterrows():
