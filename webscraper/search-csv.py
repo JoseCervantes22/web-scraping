@@ -24,11 +24,11 @@ url_csv = f"https://raw.githubusercontent.com/JoseCervantes22/Q-A/main/BenieTrai
 data = pd.read_csv(url_csv)
 
 # Initialize a counter for the ID
-id_counter = 100
+id_counter = 102
 
 # Iterate through the rows of the DataFrame
 for index, row in data.iterrows():
-    print(f"Fila {index + 1}:")
+    print(f"Row {index + 1}:")
     
     # Iterate through the rows of the DataFrame
     department = row['Department']
