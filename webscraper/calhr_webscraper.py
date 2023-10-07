@@ -77,9 +77,9 @@ if response.status_code == 200:
                     "value": [
                         {
                             "id": str(id_counter),
-                            "Title": menu_top_title,  
-                            "Content": content_div.text,
-                            "URL": menu_top_url
+                            "title": menu_top_title,  
+                            "content": content_div.text,
+                            "url": menu_top_url
                         }
                     ]
                 }
@@ -118,9 +118,9 @@ if response.status_code == 200:
                                 "value": [
                                     {
                                         "id": str(id_counter),
-                                        "Title": menu_top_title,  
-                                        "Content": content_div_content_links.text,
-                                        "URL": href
+                                        "title": menu_top_title,  
+                                        "content": content_div_content_links.text,
+                                        "url": href
                                     }
                                 ]
                             }
@@ -159,9 +159,9 @@ if response.status_code == 200:
                             "value": [
                                 {
                                     "id": str(id_counter),
-                                    "Title": menu_top_title,  
-                                    "Content": content_div.text,
-                                    "URL": menu_top_url
+                                    "title": menu_top_title,  
+                                    "content": content_div.text,
+                                    "url": menu_top_url
                                 }
                             ]
                         }
@@ -188,9 +188,9 @@ if response.status_code == 200:
                                 "value": [
                                     {
                                         "id": str(id_counter),
-                                        "Title": menu_top_title,  
-                                        "Content": content_div_2.text,
-                                        "URL": menu_top_url
+                                        "title": menu_top_title,  
+                                        "content": content_div_2.text,
+                                        "url": menu_top_url
                                     }
                                 ]
                             }
